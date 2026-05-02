@@ -92,3 +92,8 @@ pip install -r requirements.txt
 ```
 
 **3. Create `.env` file in root folder**
+
+## 📱 Mobile App
+
+The Flutter Android app repository is available here:
+👉 [zenbook-android](https://github.com/justin-0/zenbook-android)
