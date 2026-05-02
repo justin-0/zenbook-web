@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Blocked Users</h1>
+
+{% if users %}
+<div class="users-grid">
+    {% for user in users %}
+    <div class="user-card">
+        <h3>{{ user.username }}</h3>
+        <p>Email: {{ user.email }}</p>
+        <p>Warnings: {{ user.warnings_count }} warning{% if user.warnings_count > 1 %}s{% endif %}</p>
+        <p>Status:
+            {% if user.is_blocked %}
+                🚫 Blocked
+            {% else %}
+                ✅ Active
+            {% endif %}
+        </p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No blocked users found.</p>
+{% endif %}
+
+
+</body>
+</html>

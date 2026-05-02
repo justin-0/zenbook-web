@@ -1,0 +1,615 @@
+{% include "cybercell_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --danger-dark: #dc2626;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --shadow-light: 0 1px 3px 0 rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-large: 0 10px 15px -3px rgba(255, 255, 255, 0.15), 0 4px 6px -2px rgba(255, 255, 255, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.2), 0 10px 10px -5px rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .blocked-users-dashboard {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        margin-top: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    .dashboard-header {
+        max-width: 1400px;
+        margin: 0 auto 3rem;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--danger-color);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .blocked-icon {
+        font-size: 2.5rem;
+        color: var(--danger-color);
+        filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.5));
+        animation: pulseGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+        0% { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.5)); }
+        100% { filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.8)); }
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .dashboard-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        background: linear-gradient(135deg, var(--surface-color), #2d3748);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        text-align: center;
+        min-width: 120px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        border-color: var(--danger-color);
+        box-shadow: var(--shadow-medium);
+        transform: translateY(-2px);
+    }
+
+    .stat-number {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--danger-color);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .users-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        perspective: 1000px;
+    }
+
+    .user-card {
+        background: linear-gradient(135deg, var(--surface-color), #2d3748);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium), 0 0 0 1px rgba(239, 68, 68, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        position: relative;
+        cursor: pointer;
+        will-change: transform;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--danger-color), var(--danger-dark), #b91c1c);
+        z-index: 2;
+        animation: dangerPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes dangerPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .user-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .user-card:hover {
+        box-shadow: var(--shadow-xl), 0 0 30px rgba(239, 68, 68, 0.2);
+        border-color: var(--danger-color);
+        transform: translateY(-8px) scale(1.02);
+    }
+
+    .user-card:hover::after {
+        opacity: 1;
+    }
+
+    .user-card:hover {
+        animation: dangerFloat 2s ease-in-out infinite;
+    }
+
+    @keyframes dangerFloat {
+        0%, 100% { transform: translateY(-8px) scale(1.02) rotateX(0deg) rotateY(0deg); }
+        50% { transform: translateY(-12px) scale(1.02) rotateX(1deg) rotateY(1deg); }
+    }
+
+    .card-header {
+        position: relative;
+        background: linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c);
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .blocked-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        box-shadow: var(--shadow-medium), 0 0 10px rgba(239, 68, 68, 0.3);
+        z-index: 4;
+        transition: all 0.3s ease;
+        animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .user-card:hover .blocked-badge {
+        transform: scale(1.15);
+        box-shadow: var(--shadow-large), 0 0 20px rgba(239, 68, 68, 0.5);
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: white;
+        font-weight: bold;
+        box-shadow: var(--shadow-medium), 0 0 20px rgba(239, 68, 68, 0.3);
+        transition: all 0.3s ease;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-card:hover .user-avatar {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-large), 0 0 30px rgba(239, 68, 68, 0.5);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 1rem 0;
+        line-height: 1.4;
+        letter-spacing: -0.025em;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .user-card:hover .card-title {
+        color: var(--danger-color);
+        transform: translateY(-2px);
+        text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+
+    .card-info {
+        flex: 1;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #2d3748, #374151);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    .info-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: linear-gradient(180deg, var(--danger-color), var(--danger-dark));
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .user-card:hover .info-item {
+        background: linear-gradient(135deg, #374151, #4b5563);
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .user-card:hover .info-item::before {
+        transform: scaleY(1);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--danger-color);
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .info-value {
+        color: var(--text-secondary);
+        font-weight: 500;
+        word-break: break-word;
+        font-size: 0.9rem;
+    }
+
+    .warnings-count {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .status-active {
+        color: var(--success-color);
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-blocked {
+        background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+        0%, 100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
+        50% { box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); }
+    }
+
+    .view-profile-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--danger-color), var(--danger-dark));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        box-shadow: var(--shadow-light), 0 0 10px rgba(239, 68, 68, 0.2);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .view-profile-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .view-profile-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium), 0 0 20px rgba(239, 68, 68, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .view-profile-btn:hover::before {
+        left: 100%;
+    }
+
+    .no-users {
+        text-align: center;
+        background: linear-gradient(135deg, var(--surface-color), #2d3748);
+        border: 2px dashed rgba(239, 68, 68, 0.3);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: var(--shadow-light);
+    }
+
+    .no-users-icon {
+        font-size: 3rem;
+        color: var(--danger-color);
+        margin-bottom: 1rem;
+        display: block;
+        filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.3));
+    }
+
+    .no-users-text {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .users-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .blocked-users-dashboard {
+            padding: 1rem;
+        }
+
+        .users-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .dashboard-stats {
+            gap: 1rem;
+        }
+
+        .stat-item {
+            min-width: 100px;
+            padding: 0.75rem 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-title {
+            font-size: 1.25rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .info-label {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+        }
+
+        .dashboard-title {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .user-card,
+        .user-avatar,
+        .card-title,
+        .info-item,
+        .view-profile-btn,
+        .blocked-badge,
+        .blocked-icon {
+            transition: none;
+            animation: none;
+        }
+
+        .user-card:hover {
+            animation: none;
+            transform: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .user-card:focus,
+    .view-profile-btn:focus {
+        outline: 2px solid var(--danger-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div style="height: 60px"></div>
+<div class="blocked-users-dashboard">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">
+            <span class="blocked-icon">🚫</span>
+            <span>Blocked Users Management</span>
+        </h1>
+        <p class="dashboard-subtitle">Monitor and manage users who have been blocked from the system with comprehensive oversight and control</p>
+    </div>
+
+    <div class="users-container">
+        {% if users %}
+            <div class="users-grid">
+                {% for user in users %}
+                    <div class="user-card" tabindex="0">
+                        <div class="card-header">
+                            <div class="blocked-badge">
+                                <span>🚫</span>
+                                <span>BLOCKED</span>
+                            </div>
+
+                            <div class="user-avatar">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <h3 class="card-title">{{ user.username }}</h3>
+
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value">{{ user.email }}</span>
+                                </div>
+
+                                <div class="info-item">
+                                    <span class="info-label">Warnings:</span>
+                                    <span class="info-value">
+                                        <span class="warnings-count">
+                                            <span>⚠️</span>
+                                            <span>{{ user.warnings_count }} Warning{% if user.warnings_count > 1 %}s{% endif %}</span>
+                                        </span>
+                                    </span>
+                                </div>
+
+                                <div class="info-item">
+                                    <span class="info-label">Status:</span>
+                                    <span class="info-value">
+                                        {% if user.is_blocked %}
+                                            <span class="status-blocked">
+                                                <span>🚫</span>
+                                                <span>BLOCKED</span>
+                                            </span>
+                                        {% else %}
+                                            <span class="status-active">✅ Active</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="{% url 'cyber_view_userprofile_detail' user.id %}" class="view-profile-btn">
+                                <span>👤</span>
+                                <span>View Profile</span>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-users">
+                <span class="no-users-icon">🚫</span>
+                <p class="no-users-text">No blocked users found in the system</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+{% include "public_footer.html" %}

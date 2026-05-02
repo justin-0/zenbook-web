@@ -1,0 +1,761 @@
+{% include "admin_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --shadow-light: 0 1px 3px 0 rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-large: 0 10px 15px -3px rgba(255, 255, 255, 0.15), 0 4px 6px -2px rgba(255, 255, 255, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.2), 0 10px 10px -5px rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .reply-dashboard {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    .dashboard-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--surface-color);
+        color: var(--text-secondary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-light);
+    }
+
+    .back-button:hover {
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        position: relative;
+        display: inline-block;
+    }
+
+    .page-title::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        border-radius: 2px;
+    }
+
+    .page-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        margin-top: 1rem;
+    }
+
+    .complaint-details {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-large);
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .complaint-details::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--warning-color), var(--danger-color));
+        z-index: 2;
+    }
+
+    .complaint-header {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.05));
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-section {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        box-shadow: var(--shadow-medium);
+        border: 3px solid var(--border-color);
+    }
+
+    .user-info h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.025em;
+    }
+
+    .complaint-date {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .complaint-body {
+        padding: 2rem;
+    }
+
+    .section-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .complaint-message {
+        background: #2d3748;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--warning-color);
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .complaint-message::before {
+        content: '💬';
+        position: absolute;
+        top: -8px;
+        left: 12px;
+        background: var(--surface-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+    }
+
+    .message-text {
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin: 0;
+        word-break: break-word;
+    }
+
+    .reply-section {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-large);
+        position: relative;
+    }
+
+    .reply-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+        z-index: 2;
+    }
+
+    .reply-header {
+        padding: 2rem 2rem 1rem;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.05));
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .reply-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .reply-form {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+    }
+
+    .reply-textarea {
+        width: 100%;
+        min-height: 150px;
+        background: #2d3748;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        line-height: 1.6;
+        font-family: inherit;
+        resize: vertical;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    .reply-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), var(--shadow-medium);
+        background: #374151;
+    }
+
+    .reply-textarea::placeholder {
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    .character-count {
+        text-align: right;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        box-shadow: var(--shadow-light);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: var(--surface-color);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: #374151;
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        text-decoration: none;
+    }
+
+    .current-reply {
+        background: #374151;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--success-color);
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .current-reply::before {
+        content: '📝';
+        position: absolute;
+        top: -8px;
+        left: 12px;
+        background: var(--surface-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+    }
+
+    .current-reply-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--success-color);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .current-reply-text {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0;
+        font-style: italic;
+    }
+
+    .quick-replies {
+        margin-bottom: 1.5rem;
+    }
+
+    .quick-replies-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .quick-reply-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .quick-reply-btn {
+        background: #2d3748;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .quick-reply-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+        transform: translateY(-1px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .reply-dashboard {
+            padding: 1rem;
+        }
+
+        .user-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .complaint-header,
+        .complaint-body,
+        .reply-header,
+        .reply-form {
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .quick-reply-buttons {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .complaint-header,
+        .complaint-body,
+        .reply-header,
+        .reply-form {
+            padding: 1rem;
+        }
+
+        .user-info h2 {
+            font-size: 1.5rem;
+        }
+
+        .reply-textarea {
+            min-height: 120px;
+            padding: 1rem;
+        }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    .btn:focus,
+    .reply-textarea:focus,
+    .quick-reply-btn:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div class="reply-dashboard">
+    <div class="dashboard-container">
+        <!-- Back Button -->
+        <a href="{% url 'admin_view_complaints' %}" class="back-button">
+            <span>←</span>
+            <span>Back to Complaints</span>
+        </a>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">💬 Reply to Complaint</h1>
+            <p class="page-subtitle">Respond to user concerns with professionalism and care</p>
+        </div>
+
+        <!-- Complaint Details -->
+        <div class="complaint-details">
+            <div class="complaint-header">
+                <div class="user-section">
+                    <div class="user-avatar">{{ complaint.user.username|first|upper }}</div>
+                    <div class="user-info">
+                        <h2>{{ complaint.user.username }}</h2>
+                        <div class="complaint-date">
+                            <span>📅</span>
+                            <span>{{ complaint.date|date:"F d, Y - g:i A" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="complaint-body">
+                <div class="section-label">
+                    <span>📝</span>
+                    <span>User's Complaint</span>
+                </div>
+                <div class="complaint-message">
+                    <p class="message-text">{{ complaint.message }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reply Section -->
+        <div class="reply-section">
+            <div class="reply-header">
+                <h2 class="reply-title">
+                    <span>💭</span>
+                    <span>{% if complaint.reply %}Update Your Reply{% else %}Compose Your Reply{% endif %}</span>
+                </h2>
+            </div>
+
+            <div class="reply-form">
+                {% if complaint.reply %}
+                    <div class="current-reply">
+                        <div class="current-reply-label">Current Reply</div>
+                        <p class="current-reply-text">{{ complaint.reply }}</p>
+                    </div>
+                {% endif %}
+
+                <form method="POST" id="replyForm">
+                    {% csrf_token %}
+
+                    <!-- Quick Reply Templates -->
+                    <div class="quick-replies">
+                        <div class="quick-replies-title">Quick Reply Templates</div>
+                        <div class="quick-reply-buttons">
+                            <button type="button" class="quick-reply-btn" onclick="insertQuickReply('Thank you for your feedback. We have reviewed your concern and will take appropriate action.')">
+                                Professional Response
+                            </button>
+                            <button type="button" class="quick-reply-btn" onclick="insertQuickReply('We apologize for any inconvenience caused. Your concern has been forwarded to the relevant department.')">
+                                Apology Response
+                            </button>
+                            <button type="button" class="quick-reply-btn" onclick="insertQuickReply('Thank you for bringing this to our attention. We will investigate this matter thoroughly.')">
+                                Investigation Response
+                            </button>
+                            <button type="button" class="quick-reply-btn" onclick="insertQuickReply('Your complaint has been resolved. Please let us know if you need any further assistance.')">
+                                Resolution Response
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reply" class="form-label">
+                            <span>📝</span>
+                            <span>Your Response</span>
+                        </label>
+                        <textarea
+                            id="reply"
+                            name="reply"
+                            class="reply-textarea"
+                            placeholder="Type your professional reply here. Be clear, helpful, and courteous in addressing the user's concerns..."
+                            maxlength="1000"
+                            oninput="updateCharacterCount()"
+                        >{{ complaint.reply }}</textarea>
+                        <div class="character-count">
+                            <span id="charCount">{{ complaint.reply|length|default:0 }}</span>/1000 characters
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'admin_view_complaints' %}" class="btn btn-secondary">
+                            <span>✖️</span>
+                            <span>Cancel</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <span>📤</span>
+                            <span>{% if complaint.reply %}Update Reply{% else %}Send Reply{% endif %}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Enhanced Functionality -->
+<script>
+    function updateCharacterCount() {
+        const textarea = document.getElementById('reply');
+        const charCount = document.getElementById('charCount');
+        const currentLength = textarea.value.length;
+        charCount.textContent = currentLength;
+
+        if (currentLength > 900) {
+            charCount.style.color = 'red';
+        } else if (currentLength > 700) {
+            charCount.style.color = 'orange';
+        } else {
+            charCount.style.color = 'gray';
+        }
+    }
+
+    function insertQuickReply(text) {
+        const textarea = document.getElementById('reply');
+        const currentValue = textarea.value.trim();
+
+        if (currentValue === '') {
+            textarea.value = text;
+        } else {
+            if (confirm('Do you want to replace the current text with this template?')) {
+                textarea.value = text;
+            } else {
+                textarea.value += '\n\n' + text;
+            }
+        }
+
+        updateCharacterCount();
+        textarea.focus();
+
+        textarea.style.transform = 'scale(1.02)';
+        setTimeout(() => {
+            textarea.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    let saveTimeout;
+    function saveDraft() {
+        const replyText = document.getElementById('reply').value;
+        localStorage.setItem(`complaint_reply_${window.location.pathname}`, replyText);
+
+        const charCount = document.getElementById('charCount');
+        const originalText = charCount.textContent;
+        charCount.textContent = 'Saved';
+        charCount.style.color = 'green';
+
+        setTimeout(() => {
+            charCount.textContent = originalText;
+            updateCharacterCount();
+        }, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const draftKey = `complaint_reply_${window.location.pathname}`;
+        const savedDraft = localStorage.getItem(draftKey);
+        const textarea = document.getElementById('reply');
+
+        if (savedDraft && textarea.value.trim() === '') {
+            if (confirm('A draft reply was found. Would you like to load it?')) {
+                textarea.value = savedDraft;
+                updateCharacterCount();
+            }
+        }
+
+        textarea.addEventListener('input', function () {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveDraft, 2000);
+        });
+
+        const form = document.getElementById('replyForm');
+        const submitBtn = document.querySelector('.btn-primary');
+
+        form.addEventListener('submit', function (e) {
+            const replyText = textarea.value.trim();
+
+            if (replyText === '') {
+                e.preventDefault();
+                alert('Please enter a reply before submitting.');
+                textarea.focus();
+                return false;
+            }
+
+            if (replyText.length < 10) {
+                e.preventDefault();
+                alert('Please provide a more detailed reply (at least 10 characters).');
+                textarea.focus();
+                return false;
+            }
+
+            localStorage.removeItem(draftKey);
+
+            submitBtn.innerHTML = '<span>📤</span><span>Sending...</span>';
+            submitBtn.disabled = true;
+
+            // No preventDefault here – allow form to submit
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                form.submit();
+            }
+
+            if (e.key === 'Escape') {
+                if (confirm('Are you sure you want to go back? Any unsaved changes will be lost.')) {
+                    window.location.href = "{% url 'admin_view_complaints' %}";
+                }
+            }
+        });
+
+        textarea.addEventListener('focus', function () {
+            this.parentElement.style.transform = 'scale(1.01)';
+        });
+
+        textarea.addEventListener('blur', function () {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+
+        updateCharacterCount();
+    });
+</script>
+
+
+{% endblock %}

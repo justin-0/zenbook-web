@@ -1,0 +1,536 @@
+{% include "cybercell_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --shadow-light: 0 1px 3px 0 rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-large: 0 10px 15px -3px rgba(255, 255, 255, 0.15), 0 4px 6px -2px rgba(255, 255, 255, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.2), 0 10px 10px -5px rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .users-dashboard {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        margin-top: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    .dashboard-header {
+        max-width: 1400px;
+        margin: 0 auto 3rem;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .dashboard-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        background: var(--surface-color);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .stat-number {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .users-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        perspective: 1000px;
+    }
+
+    .user-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        position: relative;
+        cursor: pointer;
+        will-change: transform;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        z-index: 2;
+    }
+
+    .user-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .user-card:hover {
+        box-shadow: var(--shadow-xl);
+        border-color: rgba(59, 130, 246, 0.3);
+        transform: translateY(-8px) scale(1.02);
+    }
+
+    .user-card:hover::after {
+        opacity: 1;
+    }
+
+    .user-card:hover {
+        animation: subtleFloat 2s ease-in-out infinite;
+    }
+
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(-8px) scale(1.02) rotateX(0deg) rotateY(0deg); }
+        50% { transform: translateY(-12px) scale(1.02) rotateX(1deg) rotateY(1deg); }
+    }
+
+    .card-image-container {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #374151, #4b5563);
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+    }
+
+    .user-card:hover .card-image {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.3));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 3;
+    }
+
+    .user-card:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 1rem 0;
+        line-height: 1.4;
+        letter-spacing: -0.025em;
+        transition: all 0.3s ease;
+    }
+
+    .user-card:hover .card-title {
+        color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .card-info {
+        flex: 1;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        background: #2d3748;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .user-card:hover .info-item {
+        background: #374151;
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .user-card:hover .info-item::before {
+        transform: scaleY(1);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        color: var(--text-secondary);
+        font-weight: 500;
+        word-break: break-word;
+        font-size: 0.9rem;
+    }
+
+    .view-profile-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        box-shadow: var(--shadow-light);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .view-profile-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .view-profile-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+        color: white;
+        text-decoration: none;
+    }
+
+    .view-profile-btn:hover::before {
+        left: 100%;
+    }
+
+    .no-users {
+        text-align: center;
+        background: var(--surface-color);
+        border: 2px dashed var(--border-color);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .no-users-icon {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .no-users-text {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .joined-date-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 4;
+        transition: all 0.3s ease;
+    }
+
+    .user-card:hover .joined-date-badge {
+        background: var(--primary-color);
+        transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .users-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .users-dashboard {
+            padding: 1rem;
+        }
+
+        .users-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .dashboard-stats {
+            gap: 1rem;
+        }
+
+        .stat-item {
+            min-width: 100px;
+            padding: 0.75rem 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-image-container {
+            height: 200px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+        }
+
+        .info-item {
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .info-label {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .user-card,
+        .card-image,
+        .card-title,
+        .info-item,
+        .view-profile-btn,
+        .joined-date-badge {
+            transition: none;
+        }
+
+        .user-card:hover {
+            animation: none;
+            transform: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .user-card:focus,
+    .view-profile-btn:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+<div style="height: 60px"></div>
+<div class="users-dashboard">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Registered Users Management</h1>
+        <p class="dashboard-subtitle">Monitor and manage all registered users in the system with comprehensive user profiles and activity tracking</p>
+
+
+
+    </div>
+
+    <div class="users-container">
+        {% if users %}
+            <div class="users-grid">
+                {% for user in users %}
+                    <div class="user-card" tabindex="0">
+                        <div class="card-image-container">
+{#                            <div class="joined-date-badge">#}
+{#                                {% if user.registration_date %}#}
+{#                                    {{ user.registration_date|date:"M d, Y" }}#}
+{#                                {% endif %}#}
+{#                            </div>#}
+
+                            {% if user.profile_pic %}
+                                <img src="{{ user.profile_pic }}" class="card-image" alt="Profile Picture">
+                            {% else %}
+                                <img src="https://via.placeholder.com/350x250?text=No+Image&bg=374151&color=9CA3AF" class="card-image" alt="Default Image">
+                            {% endif %}
+
+                            <div class="image-overlay"></div>
+                        </div>
+
+                        <div class="card-body">
+                            <h3 class="card-title">{{ user.USER.username }}</h3>
+
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value">{{ user.USER.email }}</span>
+                                </div>
+
+                                <div class="info-item">
+                                    <span class="info-label">Location:</span>
+                                    <span class="info-value">{{ user.location|default:"Not specified" }}</span>
+                                </div>
+
+
+
+                                <div class="info-item">
+                                    <span class="info-label">Status:</span>
+                                    <span class="info-value">
+                                        {% if user.USER.blocked_status.first %}
+                                            {% if user.USER.blocked_status.first.is_blocked %}
+                                                🚫 Blocked
+                                            {% else %}
+                                                ✅ Active
+                                            {% endif %}
+                                        {% else %}
+                                            ✅ Active
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="{% url 'cyber_view_userprofile_detail' user.USER.id %}" class="view-profile-btn">
+                                <span>👤</span>
+                                <span>View Profile</span>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-users">
+                <span class="no-users-icon">👥</span>
+                <p class="no-users-text">No registered users found in the system</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}
+{% include "public_footer.html" %}

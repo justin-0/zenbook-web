@@ -1,0 +1,613 @@
+{% include "admin_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --shadow-light: 0 1px 3px 0 rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-large: 0 10px 15px -3px rgba(255, 255, 255, 0.15), 0 4px 6px -2px rgba(255, 255, 255, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.2), 0 10px 10px -5px rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .admin-dashboard {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        margin-top: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    .dashboard-header {
+        max-width: 1400px;
+        margin: 0 auto 3rem;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .dashboard-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        background: var(--surface-color);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .stat-number {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .messages-container {
+        max-width: 1400px;
+        margin: 0 auto 2rem;
+    }
+
+    .alert {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-left: 4px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow-light);
+    }
+
+    .alert ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .alert li {
+        color: var(--text-primary);
+        font-weight: 500;
+        padding: 0.25rem 0;
+    }
+
+    .officers-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .officers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 1.5rem;
+        perspective: 1000px;
+    }
+
+    .officer-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        will-change: transform;
+    }
+
+    .officer-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        border-radius: 16px 16px 0 0;
+    }
+
+    .officer-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 16px;
+        pointer-events: none;
+    }
+
+    .officer-card:hover {
+        box-shadow: var(--shadow-xl);
+        border-color: rgba(37, 99, 235, 0.2);
+        transform: translateY(-8px) scale(1.02);
+    }
+
+    .officer-card:hover::after {
+        opacity: 1;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .officer-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        font-weight: 700;
+        margin-right: 1rem;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .officer-card:hover .officer-avatar {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: var(--shadow-large);
+    }
+
+    .officer-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .officer-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.25rem 0;
+        line-height: 1.4;
+        letter-spacing: -0.025em;
+    }
+
+    .officer-id {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        background: #2d3748;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    .card-body {
+        position: relative;
+        z-index: 2;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.75rem;
+        background: #2d3748;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .officer-card:hover .info-item {
+        background: #374151;
+        border-color: var(--border-color);
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .officer-card:hover .info-item::before {
+        transform: scaleY(1);
+    }
+
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        font-size: 0.875rem;
+        color: white;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .officer-card:hover .info-icon {
+        transform: rotate(10deg) scale(1.1);
+        background: var(--primary-dark);
+    }
+
+    .info-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .info-value {
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        word-break: break-word;
+        line-height: 1.4;
+    }
+
+    .designation-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+    }
+
+    .officer-card:hover .designation-badge {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .joined-date {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    .officer-card:hover .joined-date {
+        background: var(--primary-color);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .no-officers {
+        text-align: center;
+        background: var(--surface-color);
+        border: 2px dashed var(--border-color);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .no-officers-icon {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .no-officers-text {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    /* Advanced 3D Tilt Effect */
+    .officer-card {
+        transform-origin: center center;
+    }
+
+    .officer-card:hover {
+        animation: subtleFloat 2s ease-in-out infinite;
+    }
+
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(-8px) scale(1.02) rotateX(0deg) rotateY(0deg); }
+        50% { transform: translateY(-12px) scale(1.02) rotateX(1deg) rotateY(1deg); }
+    }
+
+    /* Professional Loading Animation */
+    .loading-shimmer {
+        background: linear-gradient(90deg, var(--background-color) 25%, #e2e8f0 50%, var(--background-color) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .officers-grid {
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-dashboard {
+            padding: 1rem;
+        }
+
+        .officers-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .officer-card {
+            padding: 1.25rem;
+        }
+
+        .dashboard-stats {
+            gap: 1rem;
+        }
+
+        .stat-item {
+            min-width: 100px;
+            padding: 0.75rem 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+        }
+
+        .officer-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .officer-avatar {
+            margin-right: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .joined-date {
+            position: static;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .officer-card,
+        .officer-avatar,
+        .info-icon,
+        .designation-badge,
+        .joined-date,
+        .info-item {
+            transition: none;
+        }
+
+        .officer-card:hover {
+            animation: none;
+            transform: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .officer-card:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+<div style="height: 60px"></div>
+<div class="admin-dashboard">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Cybercell Officers Management</h1>
+        <p class="dashboard-subtitle">Manage and monitor your cybersecurity team members with comprehensive officer profiles and real-time status updates</p>
+
+
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            <div class="alert">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="officers-container">
+        {% if cybercells %}
+            <div class="officers-grid">
+                {% for officer in cybercells %}
+                    <div class="officer-card" tabindex="0">
+                        <div class="joined-date">
+                            {% if officer.USER.date_joined %}
+                                {{ officer.USER.date_joined|date:"M d, Y" }}
+                            {% else %}
+                                Recently
+                            {% endif %}
+                        </div>
+
+                        <div class="card-header">
+                            <div class="officer-avatar">
+                                {{ officer.USER.name|first|upper }}
+                            </div>
+                            <div class="officer-info">
+                                <h3 class="officer-name">{{ officer.USER.first_name }}</h3>
+                                <span class="officer-id">ID: {{ officer.USER.username }}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">👤</div>
+                                    <div class="info-content">
+                                        <span class="info-label">Designation</span>
+                                        <div class="info-value">{{ officer.designation|default:"Cybercell Officer" }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">📧</div>
+                                    <div class="info-content">
+                                        <span class="info-label">Email Address</span>
+                                        <div class="info-value">{{ officer.USER.email }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">📱</div>
+                                    <div class="info-content">
+                                        <span class="info-label">Phone Number</span>
+                                        <div class="info-value">{{ officer.phone|default:"Not provided" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="designation-badge" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-radius: 8px; background: #f3f3f3;color: black">
+
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span>🛡️</span>
+                                <span>{{ officer.designation|default:"Active Officer" }}</span>
+                            </div>
+
+                            <a href="{% url 'admin_remove_cybercell' officer.id %}"
+                               onclick="return confirm('Are you sure you want to remove this officer?')"
+                               style="background: var(--danger-color); color: white; padding: 0.3rem 0.8rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: background 0.2s ease;">
+                                ❌ Remove
+                            </a>
+                            </div>
+
+
+{#                            <div class="designation-badge">#}
+{#                                <span>🛡️</span>#}
+{#                                <span>{{ officer.designation|default:"Active Officer" }}</span>#}
+{#                            </div>#}
+{#                            <div style="margin-top: 1rem; text-align: right;">#}
+{#    <a href="{% url 'admin_remove_cybercell' officer.id %}"#}
+{#       onclick="return confirm('Are you sure you want to remove this officer?')"#}
+{#       style="display:inline-block; background: var(--danger-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.2s ease;">#}
+{#        ❌ Remove#}
+{#    </a>#}
+{#</div>#}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-officers">
+                <span class="no-officers-icon">🔍</span>
+                <p class="no-officers-text">No cybercell officers found in the system</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

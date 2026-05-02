@@ -1,0 +1,578 @@
+{% include "admin_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --primary-light: #60a5fa;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --card-color: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #475569;
+        --hover-color: #475569;
+        --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--background-color);
+        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .notification-form-container {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .form-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        margin: 0;
+    }
+
+    .form-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), #8b5cf6, var(--success-color));
+        z-index: 2;
+    }
+
+    .form-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.03), rgba(139, 92, 246, 0.03));
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+
+    .notification-form {
+        position: relative;
+        z-index: 3;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        letter-spacing: 0.025em;
+        transition: all 0.3s ease;
+    }
+
+    .form-textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 1.5rem;
+        background: var(--card-color);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: inherit;
+        line-height: 1.6;
+        resize: vertical;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        background: var(--surface-color);
+        transform: translateY(-2px);
+    }
+
+    .form-textarea:hover:not(:focus) {
+        border-color: var(--hover-color);
+        transform: translateY(-1px);
+    }
+
+    .character-counter {
+        position: absolute;
+        bottom: 0.75rem;
+        right: 1rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        background: var(--surface-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .form-textarea:focus + .character-counter {
+        color: var(--primary-color);
+        transform: scale(1.05);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-medium);
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        min-width: 160px;
+        justify-content: center;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-xl);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: var(--card-color);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-xl);
+        background: var(--hover-color);
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .btn-icon {
+        font-size: 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover .btn-icon {
+        transform: scale(1.2);
+    }
+
+    .form-info {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-info::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: var(--primary-color);
+    }
+
+    .info-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-text {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .preview-section {
+        background: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .preview-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .preview-content {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        min-height: 60px;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .preview-empty {
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .notification-form-container {
+            padding: 1rem;
+        }
+
+        .form-card {
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        .form-title {
+            font-size: 2rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .form-textarea {
+            min-height: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .form-title {
+            font-size: 1.75rem;
+        }
+
+        .form-subtitle {
+            font-size: 1rem;
+        }
+
+        .character-counter {
+            position: static;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .form-wrapper,
+        .form-header,
+        .form-card,
+        .form-textarea,
+        .btn,
+        .character-counter {
+            animation: none;
+            transition: none;
+        }
+
+        .form-card:hover,
+        .btn:hover {
+            transform: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .btn:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div style="height: 100px"></div>
+
+<div class="notification-form-container">
+    <div class="form-wrapper">
+        <div class="form-header">
+            <h1 class="form-title">Create New Notification</h1>
+            <p class="form-subtitle">Send important announcements and updates to all system users</p>
+        </div>
+
+        <div class="form-card">
+            <div class="form-info">
+                <h3 class="info-title">
+                    <span>💡</span>
+                    Notification Guidelines
+                </h3>
+                <p class="info-text">
+                    Keep your message clear and concise. Notifications will be visible to all users and should contain important information or announcements.
+                </p>
+            </div>
+
+            <form method="post" class="notification-form" id="notificationForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="text" class="form-label">
+                        📝 Notification Message
+                    </label>
+                    <textarea
+                        name="text"
+                        id="text"
+                        class="form-textarea"
+                        placeholder="Enter your notification message here... Be clear, concise, and informative."
+                        required
+                        maxlength="500"
+                        oninput="updatePreview(); updateCounter();"
+                    ></textarea>
+                    <div class="character-counter" id="charCounter">0 / 500</div>
+                </div>
+
+
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">📤</span>
+                        <span>Send Notification</span>
+                    </button>
+
+                    <a href="/admin_view_notifications" class="btn btn-secondary">
+                        <span class="btn-icon">↩️</span>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        const textarea = document.getElementById('text');
+        const preview = document.getElementById('previewContent');
+        const text = textarea.value.trim();
+
+        if (text) {
+            preview.innerHTML = text;
+            preview.classList.remove('preview-empty');
+        } else {
+            preview.innerHTML = '<span class="preview-empty">Your notification preview will appear here...</span>';
+        }
+    }
+
+    function updateCounter() {
+        const textarea = document.getElementById('text');
+        const counter = document.getElementById('charCounter');
+        const length = textarea.value.length;
+        const maxLength = 500;
+
+        counter.textContent = `${length} / ${maxLength}`;
+
+        if (length > maxLength * 0.9) {
+            counter.style.color = 'var(--warning-color)';
+        } else if (length > maxLength * 0.8) {
+            counter.style.color = 'var(--text-secondary)';
+        } else {
+            counter.style.color = 'var(--text-muted)';
+        }
+    }
+
+    // Auto-resize textarea and update preview/counter on input
+    document.getElementById('text').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.max(200, this.scrollHeight) + 'px';
+        updatePreview();
+        updateCounter();
+    });
+
+    // Form validation and submit
+    document.getElementById('notificationForm').addEventListener('submit', function(e) {
+        const textarea = document.getElementById('text');
+        const submitBtn = e.target.querySelector('.btn-primary');
+        const message = textarea.value.trim();
+{##}
+{#        if (message.length < 10) {#}
+{#            e.preventDefault(); // prevent only if validation fails#}
+{#            alert('Please enter a notification message with at least 10 characters.');#}
+{#            textarea.focus();#}
+{#            return;#}
+{#        }#}
+
+        // Show loading state
+        submitBtn.innerHTML = '<span class="btn-icon">⏳</span><span>Sending...</span>';
+        submitBtn.disabled = true;
+
+        // Allow normal form submission to proceed (no preventDefault here)
+    });
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        updateCounter();
+        updatePreview();
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,427 @@
+{% include 'admin_header.html' %}
+
+<style>
+  .welcome-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .welcome-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .welcome-section h1 {
+    font-size: 36px;
+    color: #0a192f;
+    margin-bottom: 15px;
+    font-weight: 700;
+    position: relative;
+  }
+
+  .welcome-section p {
+    font-size: 16px;
+    color: #475569;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+  }
+
+  .feature-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #14b8a6, #0d9488);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .feature-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(20, 184, 166, 0.3);
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .feature-icon::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    filter: blur(8px);
+  }
+
+  .feature-card:hover .feature-icon::before {
+    opacity: 0.6;
+  }
+
+  .feature-icon i {
+    font-size: 26px;
+    color: #fff;
+  }
+
+  .feature-content h3 {
+    font-size: 20px;
+    color: #0a192f;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .feature-content p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .about-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .about-content h2 {
+    font-size: 32px;
+    color: #0a192f;
+    margin-bottom: 20px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+  }
+
+  .about-content h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #14b8a6, #0d9488);
+    border-radius: 2px;
+  }
+
+  .about-content p {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 15px;
+  }
+
+  .about-image {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    height: 350px;
+  }
+
+  .about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.9) contrast(1.1);
+    transition: transform 0.5s ease;
+  }
+
+  .about-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .about-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(13, 148, 136, 0.3));
+    z-index: 1;
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+  }
+
+  .movie-showcase {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .movie-showcase h2 {
+    font-size: 28px;
+    color: #0a192f;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+  }
+
+  .movie-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(20, 184, 166, 0.4);
+  }
+
+  .movie-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .movie-card:hover img {
+    transform: scale(1.1);
+  }
+
+  .movie-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(10, 25, 47, 0.95), transparent);
+    padding: 30px 20px 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .movie-card:hover .movie-overlay {
+    transform: translateY(0);
+  }
+
+  .movie-overlay h3 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .movie-overlay p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .cyber-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .about-section {
+      grid-template-columns: 1fr;
+    }
+
+    .welcome-section h1 {
+      font-size: 28px;
+    }
+
+    .about-content h2 {
+      font-size: 24px;
+    }
+
+    .movie-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<!-- Welcome Section -->
+<div class="welcome-section">
+  <h1>Welcome to ZenBook Admin Panel</h1>
+  <p>Manage and monitor your cyber-safe social media platform with comprehensive administrative tools. Ensure a secure, respectful, and responsible online environment for all users.</p>
+</div>
+
+<!-- Features Grid -->
+<div class="features-grid">
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-shield-alt"></i>
+    </div>
+    <div class="feature-content">
+      <h3>Real-Time Protection</h3>
+      <p>Advanced AI-powered hate speech detection monitors all user interactions in real-time, ensuring immediate response to toxic content.</p>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-user-shield"></i>
+    </div>
+    <div class="feature-content">
+      <h3>CyberCell Management</h3>
+      <p>Dedicated cybersecurity officers investigate reported activities, track blocked users, and maintain platform integrity.</p>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <div class="feature-content">
+      <h3>Smart Warnings</h3>
+      <p>Three-strike system automatically warns users about inappropriate content before implementing protective measures.</p>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="feature-content">
+      <h3>Social Features</h3>
+      <p>Full-featured social platform enabling posts, comments, chats, friendships, and group interactions in a safe environment.</p>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="feature-content">
+      <h3>Complaint Handling</h3>
+      <p>Streamlined complaint management system allows efficient tracking, investigation, and resolution of user reports.</p>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="feature-content">
+      <h3>Analytics Dashboard</h3>
+      <p>Comprehensive monitoring tools provide insights into platform activity, user behavior, and safety metrics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- About Section -->
+<div class="about-section">
+  <div class="about-content">
+    <h2>About ZenBook Platform</h2>
+    <p>ZenBook is a next-generation Cyber Safe Social Media Platform designed to combine the best of social networking with cutting-edge safety mechanisms.</p>
+    <p>Our platform integrates intelligent hate speech detection that automatically monitors user comments and messages. When toxic or vulgar content is detected, users receive immediate warnings, and after three violations, protective measures are implemented to maintain community standards.</p>
+    <p>With dedicated modules for Admins, CyberCell officers, and Users, ZenBook ensures a multi-layered approach to online safety while preserving the social experience users expect.</p>
+  </div>
+  <div class="about-image">
+    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=600&fit=crop" alt="Cybersecurity Concept">
+  </div>
+</div>
+
+<!-- Movie Showcase Section -->
+<div class="movie-showcase">
+  <h2>Cybersecurity in Cinema</h2>
+  <div class="movie-grid">
+
+
+    <div class="movie-card">
+      <span class="cyber-badge">AI Threat</span>
+      <img src="https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=600&h=800&fit=crop" alt="Terminator">
+      <div class="movie-overlay">
+        <h3>Terminator Series</h3>
+        <p>Explores the dangers of AI systems and the importance of maintaining control over intelligent technology.</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <span class="cyber-badge">Surveillance</span>
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&fit=crop" alt="Enemy of the State">
+      <div class="movie-overlay">
+        <h3>Enemy of the State (1998)</h3>
+        <p>Demonstrates the power of surveillance technology and the critical need for digital privacy protection.</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <span class="cyber-badge">Social Network</span>
+      <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&h=800&fit=crop" alt="The Social Network">
+      <div class="movie-overlay">
+        <h3>The Social Network (2010)</h3>
+        <p>The birth of social media and the complex ethical challenges of connecting billions of people online.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</body>
+</htm

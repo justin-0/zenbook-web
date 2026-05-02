@@ -1,0 +1,906 @@
+{% include "admin_header.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --primary-light: #60a5fa;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #06b6d4;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --card-color: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #475569;
+        --hover-color: #475569;
+        --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--background-color);
+        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .user-profile-container {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+    }
+
+    .profile-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .back-button {
+        position: absolute;
+        top: 120px;
+        left: 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--surface-color);
+        color: var(--text-secondary);
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+        border: 1px solid var(--border-color);
+    }
+
+    .back-button:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+        background: var(--hover-color);
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .profile-container {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-medium);
+        text-align: center;
+        margin: 0 auto 3rem;
+        max-width: 500px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+        transition: all 0.3s ease;
+    }
+
+    .profile-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), #8b5cf6, var(--success-color));
+        z-index: 2;
+    }
+
+    .profile-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .profile-container:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+
+    .profile-container:hover::after {
+        opacity: 1;
+    }
+
+    .profile-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 1.5rem 0;
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 3;
+    }
+
+    .profile-image-container {
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--primary-color);
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .profile-image::after {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-color), #8b5cf6, var(--success-color));
+        z-index: -1;
+        animation: rotate 3s linear infinite;
+    }
+
+    .profile-container:hover .profile-image {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-large);
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .no-profile-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--card-color), var(--hover-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 3rem;
+        color: var(--text-muted);
+        border: 4px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .profile-container:hover .no-profile-image {
+        transform: scale(1.05);
+        border-color: var(--primary-color);
+    }
+
+    .profile-info {
+        position: relative;
+        z-index: 3;
+    }
+
+    .profile-detail {
+        background: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-detail::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .profile-detail:hover {
+        background: var(--hover-color);
+        transform: translateX(4px);
+        box-shadow: var(--shadow-light);
+    }
+
+    .profile-detail:hover::before {
+        transform: scaleY(1);
+    }
+
+    .profile-detail:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .posts-section {
+        animation: fadeInUp 0.8s ease-out;
+        animation-delay: 0.3s;
+        animation-fill-mode: both;
+    }
+
+    .posts-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .posts-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .posts-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .post-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .post-card:nth-child(1) { animation-delay: 0.1s; }
+    .post-card:nth-child(2) { animation-delay: 0.2s; }
+    .post-card:nth-child(3) { animation-delay: 0.3s; }
+    .post-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .post-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        z-index: 2;
+    }
+
+    .post-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .post-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+
+    .post-card:hover::after {
+        opacity: 1;
+    }
+
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .post-number {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .post-status {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-published {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-draft {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--warning-color);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-pending {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--danger-color);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .post-content {
+        position: relative;
+        z-index: 3;
+        margin-bottom: 1rem;
+    }
+
+    .post-text {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0 0 1rem 0;
+        padding: 1rem;
+        background: var(--card-color);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .post-image {
+        width: 100%;
+        max-width: 250px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+        margin: 1rem 0;
+    }
+
+    .post-image:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .post-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: var(--card-color);
+        border-radius: 8px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .post-date {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .comment-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 3;
+    }
+
+    .comment-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .comment-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .comment-btn:hover::before {
+        left: 100%;
+    }
+
+    .comment-section {
+        display: none;
+        margin-top: 1rem;
+        background: var(--card-color);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: relative;
+        z-index: 3;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .comment-section.show {
+        display: block;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comments-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .comments-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .comment-item {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.875rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .comment-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .comment-item:hover {
+        background: var(--hover-color);
+        transform: translateX(4px);
+    }
+
+    .comment-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .comment-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .comment-text {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .no-comments {
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        padding: 1rem;
+    }
+
+    .no-posts {
+        text-align: center;
+        background: var(--surface-color);
+        border: 2px dashed var(--border-color);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .no-posts-icon {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .no-posts-text {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .posts-grid {
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .posts-title {
+            font-size: 1.75rem;
+        }
+
+        .back-button {
+            position: static;
+            margin-bottom: 1rem;
+            align-self: flex-start;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .user-profile-container {
+            padding: 1rem;
+        }
+
+        .posts-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .post-card {
+            padding: 1.25rem;
+        }
+
+        .profile-container {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .posts-title {
+            font-size: 1.5rem;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+
+        .back-button {
+            left: 1rem;
+            top: 110px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .post-card {
+            padding: 1rem;
+        }
+
+        .profile-image,
+        .no-profile-image {
+            width: 120px;
+            height: 120px;
+        }
+
+        .profile-title {
+            font-size: 1.5rem;
+        }
+
+        .post-header {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .post-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .post-card,
+        .profile-container,
+        .comment-btn,
+        .comment-section,
+        .comment-item,
+        .profile-detail,
+        .profile-image,
+        .post-image {
+            animation: none;
+            transition: none;
+        }
+
+        .post-card:hover,
+        .profile-container:hover {
+            transform: none;
+        }
+
+        .profile-image::after {
+            animation: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .comment-btn:focus,
+    .back-button:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div style="height: 100px"></div>
+
+<div class="user-profile-container">
+    <div class="profile-wrapper">
+        <a href="{% url 'cyber_view_all_users' %}" class="back-button">
+            <span>← </span>
+            <span>Back to User List</span>
+        </a>
+
+        <!-- Profile Section -->
+        <div class="profile-container">
+            <h2 class="profile-title">User Profile</h2>
+
+            <div class="profile-image-container">
+                {% if profile.profile_pic %}
+                    <img src="{{ profile.profile_pic }}" class="profile-image" alt="Profile Picture">
+                {% else %}
+                    <div class="no-profile-image">
+                        👤
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-detail">
+                    <span class="detail-label">Username:</span>
+                    <span class="detail-value">{{ user.username }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ profile.USER.first_name|default:"Not specified" }} {{ profile.USER.last_name|default:"" }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ user.email }}</span>
+                </div>
+                <div class="profile-detail">
+                    <span class="detail-label">Location:</span>
+                    <span class="detail-value">{{ profile.location|default:"Not specified" }}</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Posts Section -->
+        <div class="posts-section">
+            <div class="posts-header">
+                <h2 class="posts-title">All Posts by {{ user.username }}</h2>
+                <p class="posts-subtitle">Monitor user activity and content for security analysis</p>
+            </div>
+
+            {% if posts %}
+                <div class="posts-grid">
+                    {% for post in posts %}
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-number">
+                                    <span>📝</span>
+                                    <span>Post #{{ forloop.counter }}</span>
+                                </div>
+                                <div class="post-status {% if post.status == 'published' %}status-published{% elif post.status == 'draft' %}status-draft{% else %}status-pending{% endif %}">
+                                    {{ post.status|title }}
+                                </div>
+                            </div>
+
+                            <div class="post-content">
+                                <div class="post-text">
+                                    {{ post.content }}
+                                </div>
+
+                                {% if post.image %}
+                                    <img src="{{ post.image }}" class="post-image" alt="Post Image">
+                                {% endif %}
+                            </div>
+
+                            <div class="post-meta">
+                                <span class="post-date">
+                                    📅 {{ post.post_date }}
+                                </span>
+                            </div>
+
+                            <!-- View Comments Toggle Button -->
+                           <a href="{% url 'admin_view_comments' post.id %}" class="comment-btn">
+    <span>💬</span>
+    <span>View Comments</span>
+</a>
+
+<!-- Comments Section -->
+<div class="comment-section" id="comment-section-{{ post.id }}">
+    <h4 class="comments-title">
+        <span>💭</span>
+        <span>Comments</span>
+    </h4>
+
+    {% with comments=post.comment_set.all %}
+        {% if comments.count > 0 %}
+            <ul class="comments-list">
+                {% for comment in comments %}
+                    <li class="comment-item">
+                        <span class="comment-author">{{ comment.user.username }}:</span>
+                        <span class="comment-text">{{ comment.text }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="no-comments">
+                No comments found for this post.
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-posts">
+                    <span class="no-posts-icon">📄</span>
+                    <p class="no-posts-text">No posts found for this user.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Comment Toggle -->
+<script>
+    function toggleComments(postId) {
+        const section = document.getElementById(`comment-section-${postId}`);
+        const button = section.previousElementSibling;
+
+        if (section.classList.contains('show')) {
+            section.classList.remove('show');
+            section.style.display = 'none';
+            button.innerHTML = '<span>💬</span><span>View Comments</span>';
+        } else {
+            section.classList.add('show');
+            section.style.display = 'block';
+            button.innerHTML = '<span>👁️</span><span>Hide Comments</span>';
+        }
+    }
+
+    // Enhanced visual feedback for comment toggles
+    document.addEventListener('DOMContentLoaded', function() {
+        const commentButtons = document.querySelectorAll('.comment-btn');
+
+        commentButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+# Environment
+.env
+
+# Media files
+media/
+
+# ffmpeg
+ffmpeg*/
+*.exe
+myapp/ffmpeg/
+
+# ML model files (large)
+*.pt
+*.pth
+*.zip
+*.wav
+
+# ML Model folders (very large)
+myapp/results/
+myapp/model_checkpoints/
+myapp/hate_speech_detector/
+myapp/manglish_sentiment_model/
+
+# Temp files
+temp_audio.wav
+transcription_result.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# Database
+db.sqlite3
+
+# PyCharm
+.idea/

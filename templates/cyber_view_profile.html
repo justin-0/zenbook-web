@@ -1,0 +1,15 @@
+{% include "cybercell_header.html" %}
+{% load static %}
+{% block content %}
+ <div style="height: 100px"></div>
+
+<h2>My Profile</h2>
+<p><strong>Name:</strong> {{ cybercell.USER.first_name }} {{ cybercell.USER.last_name }}</p>
+<p><strong>Username:</strong> {{ cybercell.USER.username }}</p>
+<p><strong>Email:</strong> {{ cybercell.USER.email }}</p>
+<p><strong>Phone:</strong> {{ cybercell.phone }}</p>
+<p><strong>Designation:</strong> {{ cybercell.designation }}</p>
+<p><strong>Status:</strong> {{ cybercell.status }}</p>
+
+{% endblock %}
+{% include "public_footer.html" %}

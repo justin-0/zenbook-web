@@ -1,0 +1,468 @@
+{% include "admin_header.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --shadow-light: 0 1px 3px 0 rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(255, 255, 255, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-large: 0 10px 15px -3px rgba(255, 255, 255, 0.15), 0 4px 6px -2px rgba(255, 255, 255, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.2), 0 10px 10px -5px rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .officer-form-page {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        margin-top: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-container {
+        max-width: 600px;
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--primary-dark));
+    }
+
+    .form-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.03), rgba(16, 185, 129, 0.03));
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .page-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        text-align: center;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 2.5rem;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        letter-spacing: 0.025em;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: #2d3748;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background: #374151;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .form-input:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+        background: #374151;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 1.25rem 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 1rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+    }
+
+    .submit-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .submit-button:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: var(--shadow-large);
+        background: linear-gradient(135deg, var(--primary-dark), #1e40af);
+    }
+
+    .submit-button:hover::before {
+        left: 100%;
+    }
+
+    .submit-button:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .messages {
+        margin-bottom: 2rem;
+    }
+
+    .message {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border-left: 4px solid;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .message.error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #fca5a5;
+        border-left-color: var(--danger-color);
+    }
+
+    .message.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #6ee7b7;
+        border-left-color: var(--success-color);
+    }
+
+    .message.info {
+        background: rgba(59, 130, 246, 0.1);
+        color: #93c5fd;
+        border-left-color: var(--primary-color);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-grid .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .icon-input {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .icon-input .form-input {
+        padding-left: 3rem;
+    }
+
+    .icon-input .form-input:focus + .input-icon {
+        color: var(--primary-color);
+    }
+
+    /* Form animations */
+    .form-group {
+        animation: slideInUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes slideInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .officer-form-page {
+            padding: 1rem;
+        }
+
+        .form-container {
+            padding: 2rem;
+            margin: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-input {
+            padding: 0.875rem 1rem;
+        }
+
+        .submit-button {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .form-input,
+        .submit-button,
+        .form-group {
+            transition: none;
+            animation: none;
+        }
+
+        .submit-button:hover {
+            transform: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .form-input:focus,
+    .submit-button:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div style="height: 60px"></div>
+<div class="officer-form-page">
+    <div class="form-container">
+        <div class="form-content">
+            <h1 class="page-title">Add Cybercell Officer</h1>
+            <p class="page-subtitle">Create a new officer account for the cybercell system</p>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name" class="form-label">👤 Full Name</label>
+                        <div class="icon-input">
+                            <input type="text" name="name" id="name" class="form-input" placeholder="Enter full name" required>
+                            <span class="input-icon">👤</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username" class="form-label">🔐 Username</label>
+                        <div class="icon-input">
+                            <input type="text" name="username" id="username" class="form-input" placeholder="Enter username" required>
+                            <span class="input-icon">🔐</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="email" class="form-label">📧 Email Address</label>
+                        <div class="icon-input">
+                            <input type="email" name="email" id="email" class="form-input" placeholder="Enter email address" required>
+                            <span class="input-icon">📧</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">🔒 Password</label>
+                        <div class="icon-input">
+                            <input type="password" name="password" id="password" class="form-input" placeholder="Enter secure password" required>
+                            <span class="input-icon">🔒</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" class="form-label">📱 Phone Number</label>
+                        <div class="icon-input">
+                            <input type="text" name="phone" id="phone" class="form-input" placeholder="Enter phone number" required>
+                            <span class="input-icon">📱</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="designation" class="form-label">🏆 Designation</label>
+                        <div class="icon-input">
+                            <input type="text" name="designation" id="designation" class="form-input" placeholder="Enter job designation" required>
+                            <span class="input-icon">🏆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button">
+                    ✨ Add Officer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const nameInput = document.getElementById("name");
+    const phoneInput = document.getElementById("phone");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+
+    form.addEventListener("submit", function (e) {
+        // Name: only alphabets
+        const nameRegex = /^[A-Za-z\s]+$/;
+        if (!nameRegex.test(nameInput.value)) {
+            alert("Name must contain only alphabets.");
+            nameInput.focus();
+            e.preventDefault();
+            return false;
+        }
+
+        // Phone: exactly 10 digits
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phoneInput.value)) {
+            alert("Phone number must be exactly 10 digits.");
+            phoneInput.focus();
+            e.preventDefault();
+            return false;
+        }
+
+        // Email: must be in @gmail.com format
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(emailInput.value)) {
+            alert("Email must be a valid Gmail address (example@gmail.com).");
+            emailInput.focus();
+            e.preventDefault();
+            return false;
+        }
+
+        // Password: at least 6 characters
+        if (passwordInput.value.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            passwordInput.focus();
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+

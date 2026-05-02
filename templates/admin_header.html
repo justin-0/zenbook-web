@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZenBook Admin Panel</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Bootstrap Icons (needed for header icons) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+      min-height: 100vh;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, #1e3a5f 0%, #0a192f 100%);
+      color: #fff;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .sidebar-header {
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-header h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-header h3 i {
+      color: #fbbf24;
+    }
+
+    .sidebar-header p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 300;
+    }
+
+    .nav-section {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-section-title {
+      padding: 0 20px 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 600;
+    }
+
+    .nav-item {
+      margin: 5px 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .nav-link:hover {
+      background: rgba(20, 184, 166, 0.2);
+      color: #fff;
+      transform: translateX(5px);
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+    }
+
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    /* ================= HEADER ================= */
+    .header {
+      position: fixed;
+      left: 280px;
+      top: 0;
+      right: 0;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      z-index: 999;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-left h4 {
+      font-size: 22px;
+      color: #0a192f;
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+      border-radius: 25px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .admin-profile:hover {
+      transform: scale(1.05);
+    }
+
+    .admin-avatar {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-avatar i {
+      font-size: 18px;
+    }
+
+    .admin-profile span {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* ================= HEADER NAV MENU (ONLY ADDITION) ================= */
+    .navmenu ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .navmenu a {
+      text-decoration: none;
+      color: #0a192f;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .navmenu .dropdown {
+      position: relative;
+    }
+
+    .navmenu .dropdown ul {
+      position: absolute;
+      top: 35px;
+      left: 0;
+      background: #ffffff;
+      min-width: 220px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: none;
+      padding: 8px 0;
+      z-index: 2000;
+    }
+
+    .navmenu .dropdown ul li a {
+      padding: 10px 18px;
+      color: #333;
+    }
+
+    .navmenu .dropdown ul li a:hover {
+      background: #f1f5f9;
+      color: #0d9488;
+    }
+
+    .navmenu .dropdown.active ul {
+      display: block;
+    }
+
+    /* ================= CONTENT ================= */
+    .main-content {
+      margin-left: 280px;
+      margin-top: 70px;
+      padding: 30px;
+      min-height: calc(100vh - 70px);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 0;
+        overflow: hidden;
+      }
+      .header {
+        left: 0;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <h3><i class="fas fa-shield-alt"></i> ZenBook</h3>
+    <p>Admin Control Panel</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Dashboard</div>
+    <div class="nav-item">
+      <a href="/adminhome" class="nav-link active">
+        <i class="fas fa-home"></i> Home
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Management</div>
+    <div class="nav-item">
+      <a href="/admin_view_cybercell" class="nav-link">
+        <i class="fas fa-user-shield"></i> CyberCell
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin_view_all_users" class="nav-link">
+        <i class="fas fa-users"></i> Users
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin_view_complaints" class="nav-link">
+        <i class="fas fa-exclamation-triangle"></i> Complaints
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin_view_notifications" class="nav-link">
+        <i class="fas fa-bell"></i> Notifications
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">System</div>
+    <div class="nav-item">
+      <a href="/logout_view" class="nav-link">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="header-left">
+    <h4>Dashboard Overview</h4>
+  </div>
+
+  <nav id="navmenu" class="navmenu">
+    <ul>
+      <li>
+        <a href="/adminhome">
+          <i class="bi bi-house-door"></i>
+          <span>Home</span>
+          <span class="status-indicator"></span>
+        </a>
+      </li>
+
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">
+          <i class="bi bi-gear"></i>
+          <span>Admin Actions</span>
+          <i class="bi bi-chevron-down"></i>
+        </a>
+        <ul>
+          <li>
+            <a href="/admin_add_cybercell">
+              <i class="bi bi-person-plus"></i>
+              <span>Add CyberCell Officer</span>
+            </a>
+          </li>
+          <li>
+            <a href="/admin_view_cybercell">
+              <i class="bi bi-people"></i>
+              <span>View Officers</span>
+            </a>
+          </li>
+          <li>
+            <a href="/admin_view_all_users">
+              <i class="bi bi-person-lines-fill"></i>
+              <span>Users</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="header-right">
+    <div class="admin-profile">
+      <div class="admin-avatar">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <span>Admin</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= MAIN CONTENT ================= -->
+<main class="main-content">
+
+
+<!-- ================= DROPDOWN SCRIPT ================= -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.querySelector('.dropdown-toggle');
+    if (toggle) {
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        this.parentElement.classList.toggle('active');
+      });
+    }
+  });
+</script>
+
+

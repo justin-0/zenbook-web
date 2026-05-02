@@ -1,0 +1,678 @@
+{% load static %}
+{% include "cybercell_header.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --primary-light: #60a5fa;
+        --secondary-color: #6b7280;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #06b6d4;
+        --background-color: #0f172a;
+        --surface-color: #1e293b;
+        --card-color: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #475569;
+        --hover-color: #475569;
+        --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--background-color);
+        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .profile-container {
+        background: var(--background-color);
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+    }
+
+    .profile-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        font-weight: 400;
+        margin: 0;
+    }
+
+    .profile-main {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .profile-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+        height: fit-content;
+    }
+
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), #8b5cf6, var(--success-color));
+        z-index: 2;
+    }
+
+    .profile-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+
+    .profile-card:hover::after {
+        opacity: 1;
+    }
+
+    .profile-avatar {
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .avatar-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 3rem;
+        color: white;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .avatar-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    .profile-card:hover .avatar-container {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-large);
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .officer-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .officer-designation {
+        font-size: 1rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .profile-details {
+        position: relative;
+        z-index: 3;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .title-icon {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+    }
+
+    .details-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+        z-index: 3;
+    }
+
+    .detail-item {
+        background: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .detail-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .detail-item:hover {
+        background: var(--hover-color);
+        transform: translateX(4px);
+        box-shadow: var(--shadow-light);
+    }
+
+    .detail-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-right: 0.75rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .detail-value {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 2rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    .stat-item {
+        background: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        border-color: var(--primary-color);
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        animation: fadeInUp 0.8s ease-out;
+        animation-delay: 0.4s;
+        animation-fill-mode: both;
+    }
+
+    .action-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+    }
+
+    .action-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .action-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-color);
+    }
+
+    .action-card:hover::after {
+        opacity: 1;
+    }
+
+    .action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 3;
+    }
+
+    .action-card:hover .action-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .action-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.75rem 0;
+        position: relative;
+        z-index: 3;
+    }
+
+    .action-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0 0 1.5rem 0;
+        flex: 1;
+        position: relative;
+        z-index: 3;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+        position: relative;
+        z-index: 3;
+        align-self: flex-start;
+    }
+
+    .action-button:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-medium);
+        color: white;
+        text-decoration: none;
+    }
+
+    .button-icon {
+        font-size: 1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .profile-main {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .actions-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-card {
+            padding: 1.5rem;
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .welcome-title {
+            font-size: 1.75rem;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-card {
+            padding: 1.25rem;
+        }
+
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+
+        .officer-name {
+            font-size: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+
+        .detail-item {
+            padding: 0.875rem 1rem;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .profile-card,
+        .action-card,
+        .avatar-container,
+        .action-icon,
+        .action-button,
+        .detail-item,
+        .stat-item {
+            animation: none;
+            transition: none;
+        }
+
+        .action-card:hover,
+        .profile-card:hover {
+            transform: none;
+        }
+
+        .avatar-container::before {
+            animation: none;
+        }
+    }
+
+    /* Focus States for Accessibility */
+    .action-card:focus,
+    .action-button:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+</style>
+
+<div style="height: 100px;"></div>
+
+<div class="profile-container">
+    <div class="profile-wrapper">
+        <div class="profile-header">
+            <h1 class="welcome-title">Welcome, {{ cybercell.name }}</h1>
+            <p class="welcome-subtitle">Cybercell Officer Profile & Dashboard</p>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <div class="avatar-container">
+                        👮‍♂️
+                    </div>
+                    <h3 class="officer-name">{{ cybercell.USER.first_name|default:"Officer" }}</h3>
+                    <p class="officer-designation">{{ cybercell.designation|default:"Cybercell Officer" }}</p>
+                </div>
+
+
+            </div>
+
+            <div class="profile-card">
+                <h4 class="section-title">
+                    <span class="title-icon">📋</span>
+                    Officer Profile Details
+                </h4>
+
+                <ul class="details-list">
+                    <li class="detail-item">
+                        <span class="detail-label">Username:</span>
+                        <span class="detail-value">{{ cybercell.USER.username }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">Full Name:</span>
+                        <span class="detail-value">{{ cybercell.USER.first_name|default:"Not specified" }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ cybercell.USER.email }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value">{{ cybercell.phone|default:"Not specified" }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">Designation:</span>
+                        <span class="detail-value">{{ cybercell.designation|default:"Cybercell Officer" }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">Officer ID:</span>
+                        <span class="detail-value">#{{ cybercell.id|stringformat:"05d" }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="actions-grid">
+            <div class="action-card" tabindex="0">
+                <div class="action-icon">
+                    👥
+                </div>
+                <h5 class="action-title">User Management</h5>
+                <p class="action-description">
+                    Monitor and manage all registered users, view their posts, comments, and activity patterns for security analysis.
+                </p>
+                <a href="{% url 'cyber_view_all_users' %}" class="action-button">
+                    <span class="button-icon">👁️</span>
+                    <span>View Users</span>
+                </a>
+            </div>
+
+            <div class="action-card" tabindex="0">
+    <div class="action-icon">
+        🚨
+    </div>
+    <h5 class="action-title">Warned Users Dashboard</h5>
+    <p class="action-description">
+        View all users who have received warnings along with their warning count and account status.
+    </p>
+    <a href="{% url 'cyber_view_warned_users' %}" class="action-button">
+        <span class="button-icon">⚡</span>
+        <span>View Warned Users</span>
+    </a>
+</div>
+
+            <div class="action-card" tabindex="0">
+                <div class="action-icon">
+                    🚫
+                </div>
+                <h5 class="action-title">Blocked Users</h5>
+                <p class="action-description">
+    View all users whose accounts have been blocked due to repeated violations or inappropriate behavior.
+</p>
+
+                <a href="{% url 'cyber_view_blocked_users' %}" class="action-button">
+                    <span class="button-icon">🚫 </span>
+                    <span>Blocked Users</span>
+                </a>
+            </div>
+
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% include "public_footer.html" %}

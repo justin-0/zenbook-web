@@ -1,0 +1,75 @@
+from django.urls import path
+from .import views
+
+urlpatterns = [
+    path('',views.home,name='home'),
+    path('login',views.login,name='login'),
+    path('logout_view/', views.logout_view, name='logout_view'),
+    path('adminhome',views.adminhome,name='adminhome'),
+    path('admin_add_cybercell',views.admin_add_cybercell,name='admin_add_cybercell'),
+    path('admin_remove_cybercell/<int:id>',views.admin_remove_cybercell,name='admin_remove_cybercell'),
+    path('admin_view_cybercell',views.admin_view_cybercell,name='admin_view_cybercell'),
+    path('admin_view_all_users',views.admin_view_all_users,name='admin_view_all_users'),
+    path('admin_view_warned_users',views.admin_view_warned_users,name='admin_view_warned_users'),
+    path('admin_view_blocked_users',views.admin_view_blocked_users,name='admin_view_blocked_users'),
+    path('admin_view_userprofile_detail/<int:user_id>/', views.admin_view_userprofile_detail, name='admin_view_userprofile_detail'),
+    path('admin_view_posts/<int:user_id>',views.admin_view_posts,name='admin_view_posts'),
+    path('admin_view_comments/<int:post_id>',views.admin_view_comments,name='admin_view_comments'),
+    path('admin_view_complaints',views.admin_view_complaints,name='admin_view_complaints'),
+    path('admin_reply_complaints/<int:complaint_id>',views.admin_reply_complaints,name='admin_reply_complaints'),
+    path('admin_add_notification/',views.admin_add_notification,name='admin_add_notification'),
+    path('admin_view_notifications/',views.admin_view_notifications,name='admin_view_notifications'),
+    # ===============================================================================================================
+    path('cyber_home',views.cyber_home,name='cyber_home'),
+    path('cyber_view_profile/', views.cyber_view_profile, name='cybercell_view_profile'),
+    path('cyber_view_all_users/', views.cyber_view_all_users, name='cyber_view_all_users'),
+    path('cyber_view_warned_users/', views.cyber_view_warned_users, name='cyber_view_warned_users'),
+    path('cyber_view_blocked_users/', views.cyber_view_blocked_users, name='cyber_view_blocked_users'),
+    path('cyber_view_userprofile_detail/<int:user_id>/', views.cyber_view_userprofile_detail, name='cyber_view_userprofile_detail'),
+    path('cyber_view_posts/<int:user_id>',views.cyber_view_posts,name='cyber_view_posts'),
+    path('cyber_view_comments/<int:post_id>',views.cyber_view_comments,name='cyber_view_comments'),
+    # ===============================================================================================================
+    path('register_user/', views.register_user, name='register_user'),
+    path('logout_user/',views.logout_user,name='logout_user'),
+    path('user_login/',views.user_login,name='user_login'),
+    path('viewprofile/',views.viewprofile,name='viewprofile'),
+    path('editprofile/',views.editprofile,name='editprofile'),
+    path('add_post/',views.add_post,name='add_post'),
+    path('view_post/', views.view_post, name='view_post'),
+    path('user_comment_post/', views.user_comment_post, name='user_comment_post'),
+    path('comment_post/',views.comment_post,name='comment_post'),
+    path('deletepost/',views.deletepost,name='deletepost'),
+    path('view_all_post/',views.view_all_post, name='view_all_post'),
+    path('view_comments/',views.view_comments, name='view_comments'),
+    path('view_warnings/',views.view_warnings, name='view_warnings'),
+    path('toggle_like/',views.toggle_like, name='toggle_like'),
+    path('view_like/',views.view_like, name='view_like'),
+    path('view_notifications/',views.view_notifications, name='view_notifications'),
+    path('send_complaint/',views.send_complaint, name='send_complaint'),
+    path('view_complaints/',views.view_complaints, name='view_complaints'),
+    path('delete_complaint/',views.delete_complaint, name='delete_complaint'),
+    path('view_all_users/',views.view_all_users, name='view_all_users'),
+    path('send_friend_request/',views.send_friend_request, name='send_friend_request'),
+    path('cancel_friend_request/',views.cancel_friend_request, name='cancel_friend_request'),
+    path('view_friend_requests/',views.view_friend_requestss, name='view_friend_requests'),
+    path('respond_friend_request/',views.respond_friend_request, name='respond_friend_request'),
+    path('delete_friend_request/',views.delete_friend_request, name='delete_friend_request'),
+    path('view_friend_list/',views.view_friend_list, name='view_friend_list'),
+    path('chat_view_user/',views.chat_view_user, name='chat_view_user'),
+    path('user_chat_send/',views.user_chat_send, name='user_chat_send'),
+
+
+    # ==========
+    path('create_group/',views.create_group, name='create_group'),
+    path('add_group_member/',views.add_group_member, name='add_group_member'),
+    path('group_chat_send/',views.group_chat_send, name='group_chat_send'),
+    path('group_chat_view/',views.group_chat_view, name='group_chat_view'),
+    path('view_group_list/',views.view_group_list, name='view_group_list'),
+    path('view_friends_for_group/',views.view_friends_for_group, name='view_friends_for_group'),
+    path('add_group_member/',views.add_group_member, name='add_group_member'),
+    path('view_group_members/',views.view_group_members, name='view_group_members'),
+
+
+
+
+]
